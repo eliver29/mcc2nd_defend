@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprehensive Data Analytics on Motor Vehicle Registration, Traffic Violation, and Driver Licensing</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="icon" type="image/png" href="static/logo1.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</head>
+
+<div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalTitle" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl">  
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="chartModalTitle"></h5>
+                <button type="button" class="close-button" data-bs-dismiss="modal" aria-label="Close">&times;</button>
+            </div>
+            <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+                <p id="chartModalDescription"></p>
+                <canvas id="modalChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<body>
+
+    <video autoplay muted loop id="bg-video">
+        <source src="static/background11.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <div class="content">
+        <header>
+            <div class="header-left">
+                <img src="static/logo1.png" alt="Logo" id="logo" style="height: 80px; cursor: pointer;" onclick="resetPage()">
+                <h3>Comprehensive Data Analytics on Motor Vehicle Registration, Traffic Violation, and Driver Licensing</h3>
+            </div>
+
+            <nav>
+                <ul>
+                    <li><a href="#" onclick="resetPage()">Home</a></li>
+                    <li><a href="#" onclick="scrollToSection('footer-content')">About Us</a></li>
+                    <li><a href="#" onclick="showContactPopup()">Contact</a></li>
+                    <li>
+                        <select id="chart-filter" onchange="filterCharts()">
+                            <option value="show-all">Show All</option>
+                            <option value="hide-all">Hide All</option>
+                            <option value="genderChart">Gender Distribution</option>
+                            <option value="topStatesChart">Top 10 States</option>
+                            <option value="ageChart">Age Distribution</option>
+                            <option value="autoChart">Auto Registrations</option>
+                            <option value="busesTrucksChart">Buses & Trucks</option>
+                            <option value="motorcycleChart">Motorcycle Registrations</option>
+                            <option value="subAgenciesChart">Sub Agencies</option>
+                            <option value="violationsChart">Traffic Violations</option>
+                            <option value="vehicleTypesChart">Vehicle Types</option>
+                        </select>
+                        
+                    </li>
+                </ul>
+            </nav>
+            
+</header>
+
+        <section class="welcome">
+            <p>"Safe driving today ensures a brighter future for everyone on the road."</p>
+        </section>
+
+        <main>
+            
+            <div class="charts-container">
+                <div class="charts" onclick="openChartModal('genderChart', 'Gender Distribution 2000 - 2020 ', 'This Pie Chart show the percentage of licensed driver male and female 2000 - 2020 ')">
+                    <h3>Gender Distribution 2000 to 2020</h3>
+                    <p>Shows the percentage of male and female licensed drivers.</p>
+                    <canvas id="genderChart"></canvas>
+                </div>
+            
+                <div class="charts" onclick="openChartModal('topStatesChart', 'Top State 2020', 'This Bar Chart show the top 10 states with the highest licensed drivers.')">
+                    <h3>Top 10 States 2020</h3>
+                    <p>Displays the top 10 states with the highest licensed drivers.</p>
+                    <canvas id="topStatesChart"></canvas>
+                </div>
+            
+                <div class="charts" onclick="openChartModal('ageChart', 'Age Distribution 2020', 'This Line Chart show the age distribution of year 2020 licensed drivers  16 years old - 85+ years old.')">
+                    <h3>Age Distribution 2020</h3>
+                    <p>Represents the distribution of drivers by age groups.</p>
+                    <canvas id="ageChart"></canvas>
+                </div>
+            
+                <div class="charts" onclick="openChartModal('autoChart', 'TOP 10 years 1900 - 2020', 'The Top 10 Years with Highest Registered Automobile.')">
+                    <h3>Auto Registrations U.S. 1900 - 2020</h3>
+                    <p>Top 10 Years with the highest registered automobiles.</p>
+                    <canvas id="autoChart"></canvas>
+                </div>
+            
+                <div class="charts" onclick="openChartModal('busesTrucksChart', 'BUS and TRUCKS 1900 - 2020', 'This Pie Chart show the 1900 - 2020 Bus and Trucks regition record.')">
+                    <h3>Buses & Trucks U.S. 1900 - 2020</h3>
+                    <p>Comparison of registered buses and trucks from 1900-2020.</p>
+                    <canvas id="busesTrucksChart"></canvas>
+                </div>
+            
+                <div class="charts" onclick="openChartModal('motorcycleChart', 'Top 10 States in U.S. 2020.', 'This Bar Chart show the top 10 states with highest registered motorcycle.')">
+                    <h3>Motorcycle Registrations U.S. 2020</h3>
+                    <p>Top 10 states with the highest motorcycle registrations.</p>
+                    <canvas id="motorcycleChart"></canvas>
+                </div>
+            
+                <div class="charts" onclick="openChartModal('subAgenciesChart', 'Top 5 SubAgencies 2020 - 2024', 'This Bar Chart displaying Subangencies with highest recorded violation.')">
+                    <h3>Sub Agencies 2020 - 2024</h3>
+                    <p>The top 5 subagencies with highest Recorded Violation.</p>
+                    <canvas id="subAgenciesChart"></canvas>
+                </div>
+            
+                <div class="charts" onclick="openChartModal('violationsChart', 'Top 10 most common Traffic Violations 2020 - 2024', 'This Horizontal Bar chart displaying the top 10 common traffic violation from 2020 - 2024.')">
+                    <h3>Traffic Violations 2020 - 2024</h3>
+                    <p>Top 10 most common traffic violations reported.</p>
+                    <canvas id="violationsChart"></canvas>
+                </div>
+            
+                <div class="charts" onclick="openChartModal('vehicleTypesChart', 'Top 5 Vehicle type 2020 - 2024 ', 'This  Pie chart showing the portion of different types of vehicles violated traffic violation.')">
+                    <h3>Vehicle Types 2020 - 2024</h3>
+                    <p>Top 5 Vehicle type with highest Violation .</p>
+                    <canvas id="vehicleTypesChart"></canvas>
+                </div>  
+            </div>
+            
+        </main>
+
+
+        <br></br>
+        <br></br>
+        <br></br>
+
+        
+        <div class="footer-content" id="footer-content">
+            <div class="footer-section about-us">
+                <h3><i class="fas fa-users"></i> About Us</h3>
+                <p>We are a dedicated data analytics firm specializing in motor vehicle registration, traffic violations, and driver licensing.</p>
+                <p>Our goal is to provide insightful, data-driven solutions that enhance road safety, streamline compliance, and improve motor vehicle administration.</p>
+            </div>
+        
+            <div class="footer-section what-we-do">
+                <h3><i class="fas fa-chart-line"></i> What We Do</h3>
+                <ul>
+                    <li>Analyze trends in vehicle registration & ownership.</li>
+                    <li>Identify patterns in traffic violations to improve enforcement.</li>
+                    <li>Enhance driver licensing processes through data insights.</li>
+                    <li>Develop interactive dashboards for decision-makers.</li>
+                    <li>Support policy development with data-backed recommendations.</li>
+                </ul>
+            </div>
+        
+            <div class="footer-section why-choose-us">
+                <h3><i class="fas fa-check-circle"></i> Why Choose Us?</h3>
+                <p><b>✔ Expertise:</b> Cutting-edge analytics for precise insights.</p>
+                <p><b>✔ Comprehensive Reports:</b> Data-driven decisions for safer roads.</p>
+                <p><b>✔ Automation & Efficiency:</b> Streamlined processes to reduce workload.</p>
+                <p><b>✔ Custom Solutions:</b> Tailored analytics for unique client needs.</p>
+            </div>
+        
+            <div class="footer-section location">
+                <h3><i class="fas fa-map-marker-alt"></i> Where Are We?</h3>
+                <p>We operate globally, serving government agencies, businesses, and researchers with reliable transportation data analytics.</p>
+            </div>
+        
+            <div class="footer-section data-source">
+                <h3><i class="fas fa-database"></i> Data Source</h3>
+                <p><a href="https://data.gov/" target="_blank">https://data.gov/</a></p>
+                
+            </div>
+        </div>
+        
+            <br></br>
+
+            <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true" style="padding-top: 20px;">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalTitle">Title</h5>
+                            <button type="button" class="close-button" data-bs-dismiss="modal" aria-label="Close">&times;</button>
+                        </div>
+                        <div class="modal-body text-center">
+                            <img id="modalImage" src="" class="img-fluid rounded">
+                            <p class="mt-3" id="modalDescription">Description</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer>
+            
+                <p>&copy; Copyright 2025 Created by: Eliver && Mercy && Liberato</p>
+            
+            </footer>
+
+    </div>
+
+    
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>

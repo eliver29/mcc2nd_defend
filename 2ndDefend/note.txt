@@ -1,0 +1,377 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const chartConfigs = {
+        "genderChart": ["/gender_distribution", "pie", "Gender Distribution", ["#fc4293", "#36A2EB"]],
+        "topStatesChart": ["/top10_states", "bar", "Top 10 States", "#FFF56D", "horizontal"],
+        "ageChart": ["/age_distribution", "line", "Age Distribution", "#FFD700","horizontal"],
+        "autoChart": ["/top10_autos", "bar", "Top 10 Auto Registrations", "#FF9F40", "horizontal"],
+        "busesTrucksChart": ["/total_buses_trucks_2010_2020", "doughnut", "Buses vs Trucks", ["#FFCD56", "#4BC0C0"]],
+        "motorcycleChart": ["/top10_motorcycles_2020", "bar", "Top 10 Motorcycle Registrations", "#9966FF"],
+        "subAgenciesChart": ["/top5_sub_agencies", "bar", "Top 5 Sub Agencies", "#FF6384"],
+        "violationsChart": ["/top10_violations", "bar", "Top 10 Violations", "#4BC0C0"],
+        "vehicleTypesChart": ["/top5_vehicle_types", "doughnut", "Top 5 Vehicle Types", 
+            ["#FF6384", "#36A2EB", "#FFCD56", "#4BC0C0", "#9966FF"]]
+    };
+
+    function loadChart(chartId, url, type, label, colors, orientation) {
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                console.log(`Data from ${url}:`, data);
+    
+                let values = data.total_counts || data.values;
+    
+                if (!data.labels || !values) {
+                    console.error(`Invalid data format from ${url}`, data);
+                    return;
+                }
+    
+                let canvas = document.getElementById(chartId);
+                if (canvas.chartInstance) {
+                    canvas.chartInstance.destroy();  // Destroy existing chart before creating a new one
+                }
+    
+                let newChart = new Chart(canvas, {
+                    type: type,
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: label,
+                            data: values,
+                            backgroundColor: colors
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: orientation === "horizontal" ? 'x' : 'y',
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                ticks: { color: "#ffffff" }
+                            },
+                            x: { 
+                                beginAtZero: true,
+                                ticks: { color: "#ffffff" }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: { color: "#ffffff" }
+                            }
+                        }
+                    }
+                });
+    
+                // Store chart instance in the canvas element
+                canvas.chartInstance = newChart;
+            })
+            .catch(error => console.error("Error loading chart data:", error));
+    }
+    
+    
+    
+
+    for (const chartId in chartConfigs) {
+        let [url, type, label, colors, orientation] = chartConfigs[chartId];
+        loadChart(chartId, url, type, label, colors, orientation);
+    }
+
+    // Filter Charts
+    const chartFilter = document.getElementById("chart-filter");
+    if (chartFilter) {
+        chartFilter.addEventListener("change", function () {
+            let filter = this.value;
+            let charts = document.querySelectorAll(".charts");
+
+            if (filter === "hide-all") {
+                charts.forEach(chart => chart.style.display = "none");
+            } else if (filter === "show-all") {
+                charts.forEach(chart => chart.style.display = "block");
+            } else {
+                charts.forEach(chart => {
+                    chart.style.display = chart.querySelector("canvas").id === filter ? "block" : "none";
+                });
+            }
+        });
+    }
+
+    // Open Chart Modal
+    function openChartModal(chartId, title, description) {
+        document.getElementById('chartModalTitle').innerText = title;
+        document.getElementById('chartModalDescription').innerText = description;
+
+        // Destroy previous modal chart if it exists
+        if (window.currentChart instanceof Chart) {
+            window.currentChart.destroy();
+        }
+
+        const ctx = document.getElementById('modalChart').getContext('2d');
+        const sourceChart = Chart.getChart(chartId);
+
+        if (sourceChart) {
+            window.currentChart = new Chart(ctx, {
+                type: sourceChart.config.type,
+                data: JSON.parse(JSON.stringify(sourceChart.config.data)),
+                options: sourceChart.config.options
+            });
+        }
+
+        new bootstrap.Modal(document.getElementById('chartModal')).show();
+    }
+
+    // Attach click event to all charts
+    document.querySelectorAll(".charts canvas").forEach(chartCanvas => {
+        chartCanvas.addEventListener("click", function () {
+            const chartId = this.id;
+            openChartModal(chartId, "Chart Details", "Detailed chart analysis.");
+        });
+    });
+
+    // Reset Page (Scroll to Top)
+    function resetPage() {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        document.getElementById("chart-filter").value = "show-all";
+        filterCharts();
+    }
+    
+
+    // Scroll to Specific Section
+    function scrollToSection(sectionId) {
+        document.getElementById(sectionId).scrollIntoView({ behavior: "smooth" });
+    }
+
+    // Expand Chart in Place
+    const charts = document.querySelectorAll(".charts");
+    const overlay = document.createElement("div");
+    overlay.classList.add("overlay");
+    document.body.appendChild(overlay);
+
+    charts.forEach(chart => {
+        chart.addEventListener("click", function () {
+            // Remove 'active' class from any other open charts
+            document.querySelectorAll(".charts.active").forEach(activeChart => {
+                activeChart.classList.remove("active");
+            });
+
+            // Add active class to clicked chart
+            this.classList.add("active");
+            overlay.style.display = "block";
+
+            // Remove any existing close buttons
+            this.querySelectorAll(".close-chart").forEach(btn => btn.remove());
+
+            // Add close button dynamically
+            let closeButton = document.createElement("button");
+            closeButton.classList.add("close-chart");
+            closeButton.innerText = "X";
+            closeButton.addEventListener("click", function () {
+                chart.classList.remove("active");
+                overlay.style.display = "none";
+                closeButton.remove();
+            });
+            this.appendChild(closeButton);
+        });
+    });
+
+    // Close chart if clicking outside of it
+    overlay.addEventListener("click", function () {
+        document.querySelectorAll(".charts.active").forEach(activeChart => {
+            activeChart.classList.remove("active");
+        });
+        overlay.style.display = "none";
+    });
+
+    let chartModal = document.getElementById("chartModal");
+if (chartModal) {
+    chartModal.addEventListener("hidden.bs.modal", function () {
+        resetPage();
+    });
+}
+
+    
+
+    // Responsive Chart Containers (Auto Resize on Zoom)
+    function updateChartContainerSize() {
+        const charts = document.querySelectorAll(".charts");
+        charts.forEach(chart => {
+            if (window.innerWidth < 1024) {
+                chart.style.width = "80%";
+            } else {
+                chart.style.width = "30%";
+            }
+        });
+    }
+
+    window.addEventListener("resize", updateChartContainerSize);
+    updateChartContainerSize();
+
+    // Navigation Scroll Behavior
+    document.querySelectorAll("nav ul li a").forEach(link => {
+        link.addEventListener("click", function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute("href").substring(1);
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 50,
+                    behavior: "smooth"
+                });
+            }
+        });
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+            document.getElementById('chartModal').style.display = "none";
+            overlay.style.display = "none";
+        }
+    });
+    
+
+});
+
+function openChartModal(chartId, label, description) {
+    let modalTitle = document.getElementById("chartModalTitle");
+    let modalDescription = document.getElementById("chartModalDescription");
+    let modalCanvas = document.getElementById("modalChart");
+
+    modalTitle.innerText = label;
+    modalDescription.innerText = description;
+
+    let chartCanvas = document.getElementById(chartId);
+    if (chartCanvas && chartCanvas.toDataURL) {
+        let ctx = modalCanvas.getContext("2d");
+        ctx.clearRect(0, 0, modalCanvas.width, modalCanvas.height);
+        modalCanvas.width = chartCanvas.width;
+        modalCanvas.height = chartCanvas.height;
+
+        let img = new Image();
+        img.src = chartCanvas.toDataURL();
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0);
+        };
+    }
+
+    let modal = new bootstrap.Modal(document.getElementById("chartModal"));
+    modal.show();
+}
+
+function showContactPopup() {
+    alert("www.Department_of_Land_Transportation@gmail.com");
+}
+
+window.onload = function () {
+    const aboutLink = document.getElementById("about-link");
+    if (aboutLink) {
+        aboutLink.addEventListener("click", function (event) {
+            event.preventDefault();
+            const aboutSection = document.getElementById("about-us-section");
+            if (aboutSection) {
+                aboutSection.scrollIntoView({ behavior: "smooth" });
+            }
+        });
+    }
+
+    // Reset page when 'X' button is clicked
+    document.querySelectorAll(".reset-chart").forEach(button => {
+        button.addEventListener("click", function () {
+            location.reload();
+        });
+    });
+};
+
+
+function filterCharts() {
+    let filter = document.getElementById("chart-filter").value;
+    let charts = document.querySelectorAll(".charts");
+
+    if (filter === "hide-all") {
+        charts.forEach(chart => chart.style.display = "none");
+    } else if (filter === "show-all") {
+        charts.forEach(chart => chart.style.display = "block");
+    } else {
+        charts.forEach(chart => {
+            chart.style.display = chart.querySelector("canvas").id === filter ? "block" : "none";
+        });
+    }
+}
+
+// Function to reset all topics when clicking outside
+document.addEventListener("click", function(event) {
+let topics = document.querySelectorAll(".topic");
+if (!event.target.closest(".topic")) {
+    topics.forEach(topic => {
+        topic.style.position = "static";
+        topic.style.transform = "none";
+        topic.style.transition = "all 0.5s ease-in-out";
+        topic.style.zIndex = "1";
+        topic.style.width = "30%";
+        topic.style.background = "rgba(255, 255, 255, 0.2)";
+        topic.style.color = "white";
+        topic.style.border = "none";
+        topic.style.boxShadow = "none";
+    });
+}
+});
+
+// Function to Reset Page (Scroll to Top)
+function resetPage() {
+window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// Function to Scroll to a Specific Section
+function scrollToSection(sectionId) {
+let section = document.getElementById(sectionId);
+if (section) {
+    section.scrollIntoView({ behavior: "smooth" });
+}
+}
+
+// Scroll to About Us Section
+function scrollToAbout() {
+document.getElementById("about-us").scrollIntoView({ behavior: "smooth" });
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const closeModalBtn = document.getElementById("closeModalBtn");
+
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener("click", function () {
+            let chartModal = document.getElementById("chartModal");
+            let modalInstance = bootstrap.Modal.getInstance(chartModal);
+            modalInstance.hide(); // Close the modal
+
+            resetPage(); // Reset the page instead of reloading
+        });
+    }
+});
+
+// Function to reset the page
+function resetPage() {
+    // Scroll to the top
+    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    // Reset chart filter dropdown to show all charts
+    const chartFilter = document.getElementById("chart-filter");
+    if (chartFilter) {
+        chartFilter.value = "show-all";
+        filterCharts();
+    }
+
+    // Reset all chart displays to default
+    document.querySelectorAll(".charts").forEach(chart => {
+        chart.style.display = "block";
+    });
+
+    // Reset any expanded charts
+    document.querySelectorAll(".charts.active").forEach(activeChart => {
+        activeChart.classList.remove("active");
+    });
+
+    // Hide overlay if any
+    const overlay = document.querySelector(".overlay");
+    if (overlay) {
+        overlay.style.display = "none";
+    }
+}
+

@@ -1,0 +1,317 @@
+/* General Styling */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  text-align: center;
+}
+
+/* Page Behavior */
+html {
+  scroll-behavior: smooth;
+}
+
+body,
+html {
+    color: white !important;
+  width: 100%;
+  height: 100%;
+  font-family: Arial, sans-serif;
+  color: white;
+}
+
+/* Background Video */
+#bg-video {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -3;
+}
+
+/* Content Wrapper */
+.content {
+  position: relative;
+  z-index: 3;
+  padding-top: 80px;
+}
+
+/* Header */
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 30px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.8);
+}
+
+h1 {
+  text-align: left;
+}
+
+h3 {
+  font-size: 24px;
+}
+
+/* Navigation */
+nav ul {
+  display: flex;
+  justify-content: center;
+  list-style: none;
+  padding: 10px 0;
+  flex-wrap: wrap;
+}
+
+nav ul li {
+  margin: 0 15px;
+}
+
+nav ul li a {
+  text-decoration: none;
+  color: white;
+  font-size: 18px;
+  transition: color 0.3s;
+}
+
+nav ul li a:hover {
+  color: #FF9F40;
+}
+
+/* Welcome Section */
+.welcome {
+  margin: 130px auto 20px;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 15px;
+  border-radius: 10px;
+  max-width: 80%;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.topics {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.topic {
+  width: 30%;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 20px;
+  border-radius: 10px;
+  transition: transform 0.3s;
+}
+
+.topic:hover {
+  transform: scale(1.05);
+}
+
+/* Charts Container */
+.charts-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.charts {
+  padding: 10px;
+  /* Decrease padding if necessary */
+  height: auto;
+  /* Allow height to adjust dynamically */
+  max-height: 500px;
+  /* If needed, increase max-height */
+  overflow-y: auto;
+  /* Add a vertical scrollbar if content overflows */
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* Keeps chart fully visible */
+}
+
+.charts:hover {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Footer */
+footer {
+  background: rgba(0, 0, 0, 0.8);
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 40px;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  text-align: center;
+}
+
+.footer-section {
+  padding: 15px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  transition: transform 0.3s ease-in-out;
+}
+
+.footer-section h3 {
+  margin-bottom: 15px;
+  font-size: 20px;
+  color: #f8c102;
+}
+
+.footer-section p,
+.footer-section ul {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.footer-section ul {
+  list-style: none;
+  padding: 0;
+}
+
+.footer-section ul li::before {
+  content: "✔ ";
+  color: #f8c102;
+  font-weight: bold;
+}
+
+.footer-section a {
+  color: #f8c102;
+  text-decoration: none;
+}
+
+.footer-section:hover {
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .charts-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .charts {
+    width: 80%;
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 768px) {
+  nav ul {
+    flex-direction: column;
+  }
+
+  nav ul li {
+    margin: 10px 0;
+  }
+
+  .charts {
+    width: 90%;
+  }
+}
+
+/* Modal Styling */
+#chartModal .modal-content {
+  background: rgba(0, 0, 0, 0.9);
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow: hidden;
+}
+
+#chartModal .modal-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+#modalChart {
+  width: 100% !important;
+  height: auto !important;
+  max-width: 600px;
+  max-height: 400px;
+}
+
+/* Focused Chart Style */
+.charts.active {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.1);
+  width: 80%;
+  height: auto;
+  max-width: 600px;
+  max-height: 80vh;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  padding: 30px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+}
+
+
+
+/* Overlay Background when Chart is Active */
+.overlay {
+  display: none;  /* Ensure it's hidden by default */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;  /* Lower than modal (1000) */
+}
+
+
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: red;
+  cursor: pointer;
+}
+.close-button:hover {
+  color: darkred;
+}
+
+.modal-body {
+    text-align: center;
+}
+
+.modal-content {
+    background-color: rgba(0, 0, 0, 0.9);
+    color: white;
+    border-radius: 10px;
+}
+
+.modal-title {
+    font-size: 22px;
+    text-align: center;
+}
